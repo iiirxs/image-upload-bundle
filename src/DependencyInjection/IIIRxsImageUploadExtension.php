@@ -8,6 +8,7 @@ use IIIRxs\ImageUploadBundle\Uploader\ChainUploader;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -46,6 +47,10 @@ class IIIRxsImageUploadExtension extends Extension implements CompilerPassInterf
             $container->setParameter('iiirxs.max.dimension.thumbnail', $config['max_thumbnail_dimension']);
         }
 
+        if (isset($config['default_image_upload_dir'])) {
+            $container->setParameter('iiirxs.image.upload.dir', $config['default_image_upload_dir']);
+        }
+
     }
 
     public function getAlias()
@@ -65,18 +70,43 @@ class IIIRxsImageUploadExtension extends Extension implements CompilerPassInterf
         $definition = $container->findDefinition(ChainUploader::class);
         $taggedServices = $container->findTaggedServiceIds('image.uploader');
 
+        $thumbnailBinding = 'int $maxThumbnailDimension';
+        $thumbnailParameter = 'iiirxs.max.dimension.thumbnail';
+
+        $imageDirParameter = 'iiirxs.image.upload.dir';
+
+        if (
+            empty($taggedServices) &&
+            $container->hasParameter($imageDirParameter) &&
+            !empty($container->getParameter($imageDirParameter))
+        ) {
+            $defaultId = 'iiirxs_image_upload.uploader.default_uploader';
+            $uploaderDefinition = $container->getDefinition($defaultId);
+            $this->addUploaderBinding($container, $uploaderDefinition, $thumbnailParameter, $thumbnailBinding);
+            $this->addUploaderBinding($container, $uploaderDefinition, $imageDirParameter, 'string $imagesDir');
+
+            $definition->addMethodCall('addUploader', [ new Reference($defaultId) ]);
+        }
+
         foreach ($taggedServices as $id => $tags) {
-            $uploaderDefinition = $container->getDefinition($id);
-
-            if ($container->hasParameter('iiirxs.max.dimension.thumbnail')) {
-                $maxThumbnailDimension = $container->getParameter('iiirxs.max.dimension.thumbnail');
-                $bindinds = $uploaderDefinition->getBindings();
-                $bindinds['int $maxThumbnailDimension'] = $maxThumbnailDimension;
-
-                $uploaderDefinition->setBindings($bindinds);
-            }
-
+            $this->addUploaderBinding($container, $container->getDefinition($id), $thumbnailParameter, $thumbnailBinding);
             $definition->addMethodCall('addUploader', [ new Reference($id) ]);
+        }
+    }
+
+    private function addUploaderBinding(
+        ContainerBuilder $containerBuilder,
+        Definition $definition,
+        string $parameter,
+        string $binding
+    )
+    {
+        if ($containerBuilder->hasParameter($parameter)) {
+            $parameterValue = $containerBuilder->getParameter($parameter);
+            $bindinds = $definition->getBindings();
+            $bindinds[$binding] = $parameterValue;
+
+            $definition->setBindings($bindinds);
         }
     }
 }

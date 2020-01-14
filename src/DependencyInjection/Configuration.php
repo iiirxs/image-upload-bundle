@@ -19,6 +19,7 @@ class Configuration implements ConfigurationInterface
                 ->integerNode('max_thumbnail_dimension')
                     ->defaultValue(600)
                 ->end()
+                ->variableNode('default_image_upload_dir')->end()
                 ->arrayNode('mappings')
                     ->fixXmlConfig('mapping')
                     ->useAttributeAsKey('class')

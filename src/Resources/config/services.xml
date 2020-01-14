@@ -24,6 +24,11 @@
         />
 
         <service
+            id="iiirxs_image_upload.uploader.default_uploader"
+            class="IIIRxs\ImageUploadBundle\Uploader\DefaultUploader"
+        />
+
+        <service
             id="iiirxs_image_upload.controller.image_controller"
             class="IIIRxs\ImageUploadBundle\Controller\ImageController"
         >

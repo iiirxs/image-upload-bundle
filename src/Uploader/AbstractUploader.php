@@ -8,6 +8,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class AbstractUploader implements ImageUploaderInterface
 {
+    const OPTIMIZED_KEY = 'optimized';
+    const THUMBNAIL_KEY = 'thumbnails';
+
     /**
      * @var string|string[]
      */
@@ -42,15 +45,25 @@ abstract class AbstractUploader implements ImageUploaderInterface
     }
 
     /**
+     * By default supports any class
+     * @param $document
+     * @return bool
+     */
+    public function supports($document): bool
+    {
+        return true;
+    }
+
+    /**
      * @return mixed
      * @throws InvalidUploadTargetDirException
      */
     protected function getOptimizedDir()
     {
-        if (!isset($this->targetDir['optimized'])) {
+        if (!isset($this->targetDir[static::OPTIMIZED_KEY])) {
             throw new InvalidUploadTargetDirException();
         }
-        return rtrim($this->targetDir['optimized'], '/\\');
+        return rtrim($this->targetDir[static::OPTIMIZED_KEY], '/\\');
     }
 
     /**
@@ -59,10 +72,10 @@ abstract class AbstractUploader implements ImageUploaderInterface
      */
     protected function getThumbnailsDir()
     {
-        if (!isset($this->targetDir['thumbnails'])) {
+        if (!isset($this->targetDir[static::THUMBNAIL_KEY])) {
             throw new InvalidUploadTargetDirException();
         }
-        return rtrim($this->targetDir['thumbnails'], '/\\');
+        return rtrim($this->targetDir[static::THUMBNAIL_KEY], '/\\');
     }
 
     /**
