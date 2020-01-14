@@ -57,6 +57,10 @@ class IIIRxsImageUploadExtension extends Extension implements CompilerPassInterf
         }
         $metadataFactoryDefinition->setArgument(2, $defaultImageUploadDir);
 
+        if (isset($config['default_image_upload_dir'])) {
+            $container->setParameter('iiirxs.image.upload.dir', $config['default_image_upload_dir']);
+        }
+
     }
 
     public function getAlias()
@@ -86,5 +90,4 @@ class IIIRxsImageUploadExtension extends Extension implements CompilerPassInterf
             $chainUploaderDefinition->addMethodCall('addUploader', [ new Reference($id) ]);
         }
     }
-
 }

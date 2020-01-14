@@ -46,8 +46,6 @@ abstract class AbstractUploader implements ImageUploaderInterface
     }
 
     /**
-     * @return mixed
-     * @throws InvalidUploadTargetDirException
      * @param $targetDir
      */
     public function setTargetDir($targetDir)
