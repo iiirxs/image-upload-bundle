@@ -1,0 +1,8 @@
+.idea
+/vendor/
+composer.lock
+phpunit.xml
+.phpunit.result.cache
+/test.html/
+/tests/cache
+/tests/files/optimized
