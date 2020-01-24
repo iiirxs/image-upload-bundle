@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container
+    xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services
+    https://symfony.com/schema/dic/services/services-1.0.xsd"
+>
+    <services>
+        <service
+            id="image_upload.odm.document_manager"
+            alias="doctrine_mongodb.odm.document_manager"
+            public="true"
+        />
+
+        <service
+            id="iiirxs_image_upload.form.image_form_service"
+            class="IIIRxs\ImageUploadBundle\Form\ImageFormService"
+            public="true"
+        >
+            <argument type="service" id="form.factory" />
+            <argument type="service" id="iiirxs_image_upload.mapping.factory.cache_class_property_metadata_factory" />
+        </service>
+
+        <service
+            id="iiirxs_image_upload.uploader.chain_uploader"
+            class="IIIRxs\ImageUploadBundle\Uploader\ChainUploader"
+            public="true"
+        />
+
+        <service
+            id="iiirxs_image_upload.uploader.default_uploader"
+            class="IIIRxs\ImageUploadBundle\Uploader\DefaultUploader"
+        >
+            <argument type="service" id="iiirxs_image_upload.mapping.factory.cache_class_property_metadata_factory" />
+        </service>
+
+        <service
+            id="iiirxs_image_upload.controller.image_controller"
+            class="IIIRxs\ImageUploadBundle\Controller\ImageController"
+        >
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+            <argument type="service" id="iiirxs_validation_error_normalizer.serializer.form_validation_error_normalizer" />
+            <tag name="controller.service_arguments" />
+        </service>
+
+        <service
+            id="iiirxs_image_upload.event_listener.image_listener"
+            class="IIIRxs\ImageUploadBundle\EventListener\ImageListener"
+        >
+            <argument type="service" id="iiirxs_image_upload.uploader.chain_uploader" />
+            <argument type="service" id="iiirxs_image_upload.mapping.factory.cache_class_property_metadata_factory" />
+            <argument type="expression">service('image_upload.odm.document_manager').getUnitOfWork()</argument>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service
+            id="iiirxs_image_upload.param_converter"
+            class="IIIRxs\ImageUploadBundle\ParamConverter\ImageParamConverter"
+            public="true"
+        >
+            <argument type="service" id="image_upload.odm.document_manager" />
+            <tag name="request.param_converter" converter="iiirxs_image_upload.param_converter" priority="false" />
+        </service>
+
+        <service
+            id="iiirxs_image_upload.mapping.factory.class_property_metadata_factory"
+            class="IIIRxs\ImageUploadBundle\Mapping\Factory\ClassPropertyMetadataFactory"
+            public="true"
+        >
+            <argument type="service" id="image_upload.odm.document_manager" />
+        </service>
+
+        <service
+            id="iiirxs_image_upload.mapping.factory.cache_class_property_metadata_factory"
+            class="IIIRxs\ImageUploadBundle\Mapping\Factory\CacheClassPropertyMetadataFactory"
+            decorates="iiirxs_image_upload.mapping.factory.class_property_metadata_factory"
+            public="true"
+        >
+            <argument type="service" id="iiirxs_image_upload.mapping.factory.cache_class_property_metadata_factory.inner" />
+        </service>
+
+        <service id="IIIRxs\ImageUploadBundle\Form\ImageFormService" alias="iiirxs_image_upload.form.image_form_service" />
+        <service id="IIIRxs\ImageUploadBundle\Uploader\ChainUploader" alias="iiirxs_image_upload.uploader.chain_uploader" />
+    </services>
+</container>
