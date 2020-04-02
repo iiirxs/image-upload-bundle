@@ -7,9 +7,11 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use IIIRxs\ExceptionHandlerBundle\Exception\Api\UnreachableCodeException;
 use IIIRxs\ExceptionHandlerBundle\Exception\Api\ValidationException;
 use IIIRxs\ImageUploadBundle\Tests\Kernel\IIIRxsImageUploadTestingKernel;
+use IIIRxs\ImageUploadBundle\Tests\Util\TestConstants;
 use IIIRxs\ImageUploadBundle\Tests\Util\TestImageContainer;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImageControllerTest extends WebTestCase
 {
@@ -34,10 +36,25 @@ class ImageControllerTest extends WebTestCase
 
     public function testUploadImages()
     {
-        $form['image_collection']['images'] = [];
+        $form['image_collection']['images'] = [
+            [
+                'file' => new UploadedFile(
+                    TestConstants::ORIGINAL_FILE_PATH,
+                    'photo.jpg',
+                    'image/jpeg',
+                    null,
+                    true
+                )
+            ],
+            [
+                'file' => null
+            ]
+        ];
+
         $browser = $this->bootTest();
         $browser->catchExceptions(false);
-        $this->doHttpRequest($browser, self::UPLOAD_PATH, $form);
+        $testContainer = $this->doHttpRequest($browser, self::UPLOAD_PATH, $form);
+        $this->documentManager->refresh($testContainer);
         $this->assertEquals(204, $browser->getResponse()->getStatusCode());
     }
 

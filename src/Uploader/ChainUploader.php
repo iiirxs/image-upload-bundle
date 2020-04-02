@@ -37,7 +37,6 @@ class ChainUploader implements ImageUploaderInterface
      * @param $document
      * @param $parent
      * @param $propertyName
-     * @throws InvalidImageUploaderClassException
      */
     public function select($document, $parent, $propertyName) {
 

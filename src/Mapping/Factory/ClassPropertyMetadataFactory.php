@@ -74,6 +74,10 @@ class ClassPropertyMetadataFactory implements ClassPropertyMetadataFactoryInterf
 
     public function hasMetadataFor($class, $property): bool
     {
+        if (empty($class) || empty($property)) {
+            return false;
+        }
+
         $class = \is_string($class) ? $class : get_class($class);
         $mappings = $this->mappings[$class]['fields'][$property] ?? [];
 

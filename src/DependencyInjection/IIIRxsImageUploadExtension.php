@@ -13,13 +13,15 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class IIIRxsImageUploadExtension extends Extension implements CompilerPassInterface
 {
-
-    const MAX_THUMBNAIL_PARAMETER = 'iiirxs.max.dimension.thumbnail';
-    const IMAGE_DIR_PARAMETER = 'iiirxs.image.upload.dir';
     const CACHE_PROVIDER_PARAMETER = 'iiirxs.cache.provider';
-
     const CACHE_CLASS_PROPERTY_METADATA_FACTORY_ID = 'iiirxs_image_upload.mapping.factory.cache_class_property_metadata_factory';
     const CLASS_PROPERTY_METADATA_FACTORY_ID = 'iiirxs_image_upload.mapping.factory.class_property_metadata_factory';
+    const DEFAULT_UPLOADER_ID = 'iiirxs_image_upload.uploader.default_uploader';
+
+    const IMAGE_DIR_PARAMETER = 'iiirxs.image.upload.dir';
+    const MAX_THUMBNAIL_BINDING = 'int $maxThumbnailDimension';
+    const MAX_THUMBNAIL_PARAMETER = 'iiirxs.max.dimension.thumbnail';
+
     const PARAM_CONVERTER_ID = 'iiirxs_image_upload.param_converter';
     /**
      * Loads a specific configuration.
@@ -77,6 +79,8 @@ class IIIRxsImageUploadExtension extends Extension implements CompilerPassInterf
             return;
         }
 
+        $this->setUpDefaultUploader($container);
+
         $cachePoolId = $container->getParameter(self::CACHE_PROVIDER_PARAMETER);
         $cachePoolDefinition = $container->getDefinition($cachePoolId);
 
@@ -89,5 +93,15 @@ class IIIRxsImageUploadExtension extends Extension implements CompilerPassInterf
         foreach ($taggedServices as $id => $tags) {
             $chainUploaderDefinition->addMethodCall('addUploader', [ new Reference($id) ]);
         }
+    }
+
+    protected function setUpDefaultUploader(ContainerBuilder $containerBuilder)
+    {
+        $maxThumbnail = $containerBuilder->getParameter(self::MAX_THUMBNAIL_PARAMETER);
+        $defaultUploaderDefinition = $containerBuilder->getDefinition(self::DEFAULT_UPLOADER_ID);
+
+        $bindings = $defaultUploaderDefinition->getBindings();
+        $bindings[self::MAX_THUMBNAIL_BINDING] = $maxThumbnail;
+        $defaultUploaderDefinition->setBindings($bindings);
     }
 }

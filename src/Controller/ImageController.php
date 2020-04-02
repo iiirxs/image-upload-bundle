@@ -83,7 +83,6 @@ class ImageController extends AbstractController
      * @throws ExceptionInterface
      * @throws MongoDBException
      * @throws ValidationException
-     * @throws UnsetDataClassException
      * @ParamConverter(name="object", options={ "case": "images" }, converter="iiirxs_image_upload.param_converter")
      */
     public function postImageDetails(

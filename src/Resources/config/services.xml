@@ -32,6 +32,7 @@
             class="IIIRxs\ImageUploadBundle\Uploader\DefaultUploader"
         >
             <argument type="service" id="iiirxs_image_upload.mapping.factory.cache_class_property_metadata_factory" />
+            <tag name="image.uploader" />
         </service>
 
         <service

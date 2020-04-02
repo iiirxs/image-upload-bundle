@@ -63,14 +63,13 @@ class ImageListener implements EventSubscriberInterface
 
     /**
      * @param ImagesUploadEvent $event
-     * @throws InvalidImageUploaderClassException
      * @throws InvalidSelectedImageUploaderException
      */
     public function onImagesUpload(ImagesUploadEvent $event)
     {
-        $images = $event->getImageCollection();
+        $images = $event->getUploadableCollection();
         foreach ($images as $image) {
-            $this->uploadImage($image);
+            $this->uploadImage($image, $event->getParent(), $event->getPropertyName());
         }
 
     }
@@ -85,13 +84,12 @@ class ImageListener implements EventSubscriberInterface
 
     /**
      * @param ImageInterface $image
-     * @throws InvalidImageUploaderClassException
+     * @param $parent
+     * @param string $propertyPath
      * @throws InvalidSelectedImageUploaderException
      */
-    protected function uploadImage(ImageInterface $image)
+    protected function uploadImage(ImageInterface $image, $parent, ?string $propertyPath)
     {
-        list($mapping, $parent, $propertyPath) = $this->unitOfWork->getParentAssociation($image);
-
         $this->uploader->select($image, $parent, $propertyPath);
         $filename = $this->uploader->upload($image->getFile());
 

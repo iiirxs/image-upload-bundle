@@ -49,6 +49,8 @@ class CacheClassPropertyMetadataFactory implements ClassPropertyMetadataFactoryI
      */
     public function hasMetadataFor($class, $property): bool
     {
+        $class = \is_string($class) ? $class : get_class($class);
+
         return $this->cacheItemPool->hasItem($this->getKey($class, $property))
             || $this->decorated->hasMetadataFor($class, $property);
     }

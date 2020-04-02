@@ -43,10 +43,20 @@ class ImagesUploadEvent extends Event
         $this->propertyName = $propertyName;
     }
 
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    public function getPropertyName()
+    {
+        return $this->propertyName;
+    }
+
     /**
      * @return Collection
      */
-    public function getImageCollection()
+    public function getUploadableCollection()
     {
         if ($this->parent instanceof ImageInterface) {
             return new ArrayCollection([$this->parent]);
