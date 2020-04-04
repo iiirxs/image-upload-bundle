@@ -6,6 +6,7 @@ namespace IIIRxs\ImageUploadBundle\Tests\Controller;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use IIIRxs\ExceptionHandlerBundle\Exception\Api\UnreachableCodeException;
 use IIIRxs\ExceptionHandlerBundle\Exception\Api\ValidationException;
+use IIIRxs\ImageUploadBundle\Document\ImageInterface;
 use IIIRxs\ImageUploadBundle\Tests\Kernel\IIIRxsImageUploadTestingKernel;
 use IIIRxs\ImageUploadBundle\Tests\Util\TestConstants;
 use IIIRxs\ImageUploadBundle\Tests\Util\TestImageContainer;
@@ -39,7 +40,7 @@ class ImageControllerTest extends WebTestCase
         $form['image_collection']['images'] = [
             [
                 'file' => new UploadedFile(
-                    TestConstants::ORIGINAL_FILE_PATH,
+                    TestConstants::getUploadableFilePath(),
                     'photo.jpg',
                     'image/jpeg',
                     null,
@@ -103,6 +104,59 @@ class ImageControllerTest extends WebTestCase
         $this->doHttpRequest($browser, self::POST_DETAILS_PATH, [], $data);
     }
 
+    public function testDeleteImages()
+    {
+        $path1 = TestConstants::getUploadableFilePath();
+        $path2 = TestConstants::getUploadableFilePath();
+        $form['image_collection']['images'] = [
+            [
+                'file' => new UploadedFile(
+                    $path1,
+                    'photo.jpg',
+                    'image/jpeg',
+                    null,
+                    true
+                ),
+                'rank' => 1
+            ],
+            [
+                'file' => new UploadedFile(
+                    $path2,
+                    'photo.jpg',
+                    'image/jpeg',
+                    null,
+                    true
+                ),
+                'rank' => 22
+            ]
+        ];
+
+        $browser = $this->bootTest();
+        $browser->catchExceptions(false);
+        $testContainer = $this->doHttpRequest($browser, self::UPLOAD_PATH, $form);
+        $this->documentManager->refresh($testContainer);
+
+        $image1 = $testContainer->getImages()->first();
+        $image2 = $testContainer->getImages()->get(1);
+
+        $url = self::UPLOAD_PATH . $testContainer->getId();
+
+        $form['image_collection']['images'] = [
+            1 => [
+                'rank' => 33
+            ]
+        ];
+
+        $this->postImageRequest($browser, $url, $form);
+        $this->documentManager->refresh($testContainer);
+
+        /** @var ImageInterface $image */
+        $image = $testContainer->getImages()->first();
+        $this->assertEquals($image2->getPath(), $image->getPath());
+
+        $this->assertEquals(33, $image->getRank());
+    }
+
     /**
      * @param KernelBrowser $browser
      * @param $baseUrl
@@ -117,8 +171,13 @@ class ImageControllerTest extends WebTestCase
 
         $url = $baseUrl . $testImageContainer->getId();
         $data = !empty($data) ? json_encode($data) : null;
-        $browser->request('POST', $url, $form, [], [], $data);
+        $this->postImageRequest($browser, $url, $form, $data);
         return $testImageContainer;
+    }
+
+    private function postImageRequest(KernelBrowser $browser, string $url, $form = [], $data = null)
+    {
+        $browser->request('POST', $url, $form, [], [], $data);
     }
 
     /**
@@ -127,10 +186,11 @@ class ImageControllerTest extends WebTestCase
     private function bootTest(): KernelBrowser
     {
         $config = [
-            'default_image_upload_dir' => [
-                'optimized' => '%kernel.project_dir%/tests/files/optimized',
-                'thumbnails' => '%kernel.project_dir%/tests/files/thumbnails',
-            ]
+            'default_image_upload_dir' => '%kernel.project_dir%/tests/files/general'
+//            'default_image_upload_dir' => [
+//                'optimized' => '%kernel.project_dir%/tests/files/optimized',
+//                'thumbnails' => '%kernel.project_dir%/tests/files/thumbnails',
+//            ]
         ];
         $kernel = new IIIRxsImageUploadTestingKernel('test', true, $config);
         $kernel->boot();

@@ -21,11 +21,8 @@ class AbstractUploaderTest extends TestCase
 
     public function setUp(): void
     {
-        $filesystem = new Filesystem();
-        $filesystem->copy(TestConstants::ORIGINAL_FILE_PATH, TestConstants::UPLOADED_FILE_PATH);
-
         $this->uploadedFile = new UploadedFile(
-            TestConstants::UPLOADED_FILE_PATH,
+            TestConstants::getUploadableFilePath(),
             'photo.jpg',
             'image/jpeg',
             null,

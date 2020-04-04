@@ -160,5 +160,4 @@ class IIIRxsImageUploadTestingKernel extends Kernel
         return __DIR__.'/cache/'.spl_object_hash($this);
     }
 
-
 }

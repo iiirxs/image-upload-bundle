@@ -46,7 +46,7 @@ class ClassPropertyMetadataFactoryTest extends TestCase
                 'fields' => [
                     'images' => [
                         'class' => AbstractImage::class,
-                        'form_type' => ImageType::class
+                        'entry_type' => ImageType::class
                     ]
                 ]
             ]

@@ -18,7 +18,9 @@ class ImageFormServiceTest extends TestCase
     public function testGetImageCollectionTypeOptions()
     {
         $formFactory = $this->createMock(FormFactory::class);
-        $imageFormService = new ImageFormService($formFactory, $this->getMockMetadataFactoryWithMetadata());
+        $metadataFactory = $this->createMock(CacheClassPropertyMetadataFactory::class);
+
+        $imageFormService = new ImageFormService($formFactory, $metadataFactory);
 
         $imageTypeOptions = [
             'data_class' => DummyDocument::class,
@@ -27,7 +29,7 @@ class ImageFormServiceTest extends TestCase
             'field_name' => 'dummyField'
         ];
 
-        $this->assertEquals($imageTypeOptions, $imageFormService->getImageCollectionTypeOptions(new DummyDocument(), 'dummyField'));
+        $this->assertEquals($imageTypeOptions, $imageFormService->getImageCollectionTypeOptions($this->getMetadata()));
     }
 
     public function testCreateForm()
@@ -54,14 +56,21 @@ class ImageFormServiceTest extends TestCase
     private function getMockMetadataFactoryWithMetadata()
     {
         $metadataFactory = $this->createMock(CacheClassPropertyMetadataFactory::class);
-        $metadata = new ClassPropertyMetadata(DummyDocument::class, 'dummyField', []);
+
         $metadataFactory
             ->expects($this->once())
             ->method('getMetadataFor')
             ->with($this->equalTo(new DummyDocument()), 'dummyField')
-            ->willReturn($metadata);
+            ->willReturn($this->getMetadata());
 
         return $metadataFactory;
+    }
+
+
+
+    private function getMetadata()
+    {
+        return new ClassPropertyMetadata(DummyDocument::class, 'dummyField', []);
     }
 
 //    public function mappingExceptionProvider()
@@ -82,7 +91,7 @@ class ImageFormServiceTest extends TestCase
 //            [
 //                'mappings' => [
 //                    DummyDocument::class => [ 'fields' => [
-//                        'dummyField' => [ 'class' => DummyDocument::class, 'form_type' => 'Invalid_Class' ] ]
+//                        'dummyField' => [ 'class' => DummyDocument::class, 'entry_type' => 'Invalid_Class' ] ]
 //                    ]
 //                ],
 //                'exceptionClass' => InvalidClassException::class

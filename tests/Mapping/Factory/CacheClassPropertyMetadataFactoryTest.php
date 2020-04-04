@@ -23,7 +23,7 @@ class CacheClassPropertyMetadataFactoryTest extends TestCase
                 'fields' => [
                     'images' => [
                         'class' => AbstractImage::class,
-                        'form_type' => ImageType::class,
+                        'entry_type' => ImageType::class,
                         'directories' => [
                             'optimized' => 'test',
                             'thumbnails' => 'test'

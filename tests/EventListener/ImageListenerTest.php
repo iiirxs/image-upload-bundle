@@ -108,7 +108,7 @@ class ImageListenerTest extends WebTestCase
 
         $listener = new ImageListener($this->getMockUploader(), $metadataFactory, $this->getMockUoW());
 
-        $event = new ImagesDeleteEvent($image);
+        $event = new ImagesDeleteEvent(new ArrayCollection([$image]), null, null);
 
         $listener->onImagesDelete($event);
 

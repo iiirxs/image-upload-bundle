@@ -22,6 +22,6 @@ class ClassPropertyMetadataTest extends TestCase
     {
         $this->expectException(InvalidClassException::class);
 
-        new ClassPropertyMetadata('class', 'field', ['form_type' => 'invalid_class']);
+        new ClassPropertyMetadata('class', 'field', ['entry_type' => 'invalid_class']);
     }
 }
