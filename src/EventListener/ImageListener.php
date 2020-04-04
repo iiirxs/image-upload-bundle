@@ -4,33 +4,24 @@
 namespace IIIRxs\ImageUploadBundle\EventListener;
 
 use Doctrine\ODM\MongoDB\UnitOfWork;
-use IIIRxs\ImageUploadBundle\Document\AbstractImage;
 use IIIRxs\ImageUploadBundle\Document\ImageInterface;
 use IIIRxs\ImageUploadBundle\Event\ImagesDeleteEvent;
 use IIIRxs\ImageUploadBundle\Event\ImagesUploadEvent;
-use IIIRxs\ImageUploadBundle\Exception\InvalidImageUploaderClassException;
 use IIIRxs\ImageUploadBundle\Exception\InvalidSelectedImageUploaderException;
 use IIIRxs\ImageUploadBundle\Mapping\Factory\CacheClassPropertyMetadataFactory;
 use IIIRxs\ImageUploadBundle\Uploader\ChainUploader;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImageListener implements EventSubscriberInterface
 {
-    /**
-     * @var ChainUploader
-     */
+    /** @var ChainUploader */
     private $uploader;
 
-    /**
-     * @var CacheClassPropertyMetadataFactory
-     */
+    /** @var CacheClassPropertyMetadataFactory */
     private $metadataFactory;
 
-    /**
-     * @var UnitOfWork
-     */
+    /** @var UnitOfWork */
     private $unitOfWork;
 
     /**
@@ -67,11 +58,10 @@ class ImageListener implements EventSubscriberInterface
      */
     public function onImagesUpload(ImagesUploadEvent $event)
     {
-        $images = $event->getUploadableCollection();
+        $images = $event->getImageCollection();
         foreach ($images as $image) {
             $this->uploadImage($image, $event->getParent(), $event->getPropertyName());
         }
-
     }
 
     /**
@@ -79,7 +69,10 @@ class ImageListener implements EventSubscriberInterface
      */
     public function onImagesDelete(ImagesDeleteEvent $event)
     {
-        $this->deleteImage($event->getImage());
+        $images = $event->getImageCollection();
+        foreach ($images as $image) {
+            $this->deleteImage($image, $event->getParent(), $event->getPropertyName());
+        }
     }
 
     /**
@@ -96,15 +89,15 @@ class ImageListener implements EventSubscriberInterface
         $image->completeUpload($filename);
     }
 
-    protected function deleteImage(AbstractImage $image)
+    protected function deleteImage(ImageInterface $image, $parent, ?string $propertyPath)
     {
         $filesystem = new Filesystem();
 
-        list($mapping, $parent, $propertyPath) = $this->unitOfWork->getParentAssociation($image);
+        $metadata = $this->metadataFactory->getMetadataFor($parent, $propertyPath);
 
-        $metadata = $this->metadataFactory->getMetadataFor($parent, $mapping['fieldName']);
-
-        foreach ($metadata->getDirectories() as $directory) {
+        $directories = $metadata->getDirectories();
+        $directories = is_array($directories) ? $directories : [$directories];
+        foreach ($directories as $directory) {
             $filesystem->remove($directory . '/' . $image->getPath());
         }
     }
