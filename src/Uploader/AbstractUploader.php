@@ -2,6 +2,7 @@
 
 namespace IIIRxs\ImageUploadBundle\Uploader;
 
+use IIIRxs\ImageUploadBundle\DependencyInjection\Configuration;
 use IIIRxs\ImageUploadBundle\Exception\InvalidUploadTargetDirException;
 use Spatie\ImageOptimizer\OptimizerChainFactory;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -9,7 +10,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 abstract class AbstractUploader implements ImageUploaderInterface
 {
 
-    const OPTIMIZED_KEY = 'optimized';
     const THUMBNAIL_KEY = 'thumbnails';
 
     /** @var string|string[] */
@@ -74,10 +74,10 @@ abstract class AbstractUploader implements ImageUploaderInterface
      */
     protected function validateTargetDir(): bool
     {
+        $validKeys = [ Configuration::OPTIMIZED_KEY, Configuration::THUMBNAILS_KEY ];
         return !empty($this->targetDir)
-            && !(is_array($this->targetDir) &&
-                !empty(array_diff(array_keys($this->targetDir), [static::OPTIMIZED_KEY, static::THUMBNAIL_KEY]))
-            );
+            && !(is_array($this->targetDir)
+            && !empty(array_diff(array_keys($this->targetDir), $validKeys)));
     }
 
     /**
@@ -85,7 +85,7 @@ abstract class AbstractUploader implements ImageUploaderInterface
      */
     protected function getOptimizedDir(): string
     {
-        return rtrim($this->targetDir[static::OPTIMIZED_KEY], '/\\');
+        return rtrim($this->targetDir[Configuration::OPTIMIZED_KEY], '/\\');
     }
 
     /**
