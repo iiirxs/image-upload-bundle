@@ -2,34 +2,23 @@
 
 namespace IIIRxs\ImageUploadBundle\Event;
 
-use IIIRxs\ImageUploadBundle\Document\AbstractImage;
-use Symfony\Contracts\EventDispatcher\Event;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use IIIRxs\ImageUploadBundle\Document\ImageInterface;
 
-class ImagesDeleteEvent extends Event
+class ImagesDeleteEvent extends AbstractImageEvent
 {
-
     public const NAME = 'images.delete';
 
     /**
-     * @var AbstractImage
+     * @return Collection
      */
-    private $image;
-
-    /**
-     * ImagesDeleteEvent constructor.
-     * @param AbstractImage $image
-     */
-    public function __construct(AbstractImage $image)
+    public function getImageCollection(): Collection
     {
-        $this->image = $image;
-    }
+        if ($this->parent instanceof ImageInterface) {
+            return new ArrayCollection([$this->parent]);
+        }
 
-    /**
-     * @return AbstractImage
-     */
-    public function getImage(): AbstractImage
-    {
-        return $this->image;
+        return $this->document;
     }
-
 }
