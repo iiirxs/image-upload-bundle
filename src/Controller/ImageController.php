@@ -56,6 +56,10 @@ class ImageController extends AbstractController
         DocumentManager $documentManager
     )
     {
+        if ($this->container->has('security.authorization_checker')) {
+            $this->denyAccessUnlessGranted('edit', $object);
+        }
+
         $fieldName = lcfirst(str_replace('-', '', ucwords($fieldName, '-')));
         $form = $imageFormService->createForm($object, $fieldName);
         $form->handleRequest($request);
@@ -94,6 +98,10 @@ class ImageController extends AbstractController
         DocumentManager $documentManager
     )
     {
+        if ($this->container->has('security.authorization_checker')) {
+            $this->denyAccessUnlessGranted('edit', $object);
+        }
+
         $fieldName = lcfirst(str_replace('-', '', ucwords($fieldName, '-')));
         $form = $imageFormService->createForm($object, $fieldName);
 
