@@ -28,6 +28,15 @@
         />
 
         <service
+            id="iiirxs_image_upload.event_listener.on_flush_listener"
+            class="IIIRxs\ImageUploadBundle\EventListener\OnFlushListener"
+            public="true"
+        >
+            <argument type="service" id="event_dispatcher" />
+            <tag name="doctrine_mongodb.odm.event_listener" event="onFlush" />
+        </service>
+
+        <service
             id="iiirxs_image_upload.uploader.default_uploader"
             class="IIIRxs\ImageUploadBundle\Uploader\DefaultUploader"
         >
