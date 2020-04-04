@@ -6,3 +6,5 @@ phpunit.xml
 /test.html/
 /tests/cache
 /tests/files/optimized
+/tests/files/general
+/tests/files/thumbnails
