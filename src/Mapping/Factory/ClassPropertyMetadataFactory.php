@@ -9,7 +9,6 @@ use IIIRxs\ImageUploadBundle\Document\AbstractImage;
 use IIIRxs\ImageUploadBundle\Exception\InvalidClassException;
 use IIIRxs\ImageUploadBundle\Exception\InvalidPropertyException;
 use IIIRxs\ImageUploadBundle\Exception\InvalidUploadTargetDirException;
-use IIIRxs\ImageUploadBundle\Exception\UnsetDataClassException;
 use IIIRxs\ImageUploadBundle\Mapping\ClassPropertyMetadata;
 use IIIRxs\ImageUploadBundle\Mapping\ClassPropertyMetadataInterface;
 

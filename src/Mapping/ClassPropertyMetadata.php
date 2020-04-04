@@ -3,25 +3,31 @@
 
 namespace IIIRxs\ImageUploadBundle\Mapping;
 
-
+use IIIRxs\ImageUploadBundle\DependencyInjection\Configuration;
 use IIIRxs\ImageUploadBundle\Exception\InvalidClassException;
+use IIIRxs\ImageUploadBundle\Form\Type\ImageCollectionType;
 use IIIRxs\ImageUploadBundle\Form\Type\ImageType;
+use IIIRxs\ImageUploadBundle\Util\DirectoryHelper;
 
 class ClassPropertyMetadata implements ClassPropertyMetadataInterface
 {
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $className;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $propertyName;
 
+    /** @var string */
+    private $formType;
+
+    /** @var string */
     private $entryType;
+
+    /** @var string|null */
     private $imageClass;
+
+    /** @var array|string|null */
     private $directories;
 
     /**
@@ -37,11 +43,15 @@ class ClassPropertyMetadata implements ClassPropertyMetadataInterface
         $this->propertyName = $propertyName;
 
         $this->setImageClass($config['class'] ?? null);
-        $this->setEntryType($config['form_type'] ?? ImageType::class);
-        $this->directories = $config['directories'] ?? null;
+        $this->setEntryType($config['entry_type'] ?? ImageType::class);
+        $this->setFormType($config['form_type'] ?? ImageCollectionType::class);
+        $this->directories = DirectoryHelper::getDirectoriesFromConfiguration($config, Configuration::DIRECTORIES_KEY);
     }
 
-    public function getImageClass()
+    /**
+     * @return string|null
+     */
+    public function getImageClass():? string
     {
         return $this->imageClass;
     }
@@ -60,17 +70,20 @@ class ClassPropertyMetadata implements ClassPropertyMetadataInterface
         return $this;
     }
 
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->className;
     }
 
-    public function getPropertyName()
+    public function getPropertyName(): string
     {
         return $this->propertyName;
     }
 
-    public function getEntryType()
+    /**
+     * @return string
+     */
+    public function getEntryType(): string
     {
         return $this->entryType;
     }
@@ -83,10 +96,33 @@ class ClassPropertyMetadata implements ClassPropertyMetadataInterface
     public function setEntryType(string $entryType): ClassPropertyMetadata
     {
         if (!class_exists($entryType)) {
-            throw new InvalidClassException('Invalid mapped class in form_type configuration');
+            throw new InvalidClassException('Invalid mapped class in entry_type configuration');
         }
 
         $this->entryType = $entryType;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormType(): string
+    {
+        return $this->formType;
+    }
+
+    /**
+     * @param string $formType
+     * @return ClassPropertyMetadata
+     * @throws InvalidClassException
+     */
+    public function setFormType(string $formType): ClassPropertyMetadata
+    {
+        if (!class_exists($formType)) {
+            throw new InvalidClassException('Invalid mapped class in form_type configuration');
+        }
+
+        $this->formType = $formType;
         return $this;
     }
 
