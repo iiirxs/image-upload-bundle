@@ -3,6 +3,8 @@
 namespace IIIRxs\ImageUploadBundle\Form;
 
 use IIIRxs\ImageUploadBundle\Form\Type\ImageCollectionType;
+use IIIRxs\ImageUploadBundle\Mapping\ClassPropertyMetadata;
+use IIIRxs\ImageUploadBundle\Mapping\ClassPropertyMetadataInterface;
 use IIIRxs\ImageUploadBundle\Mapping\Factory\CacheClassPropertyMetadataFactory;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -42,21 +44,21 @@ class ImageFormService
      */
     public function createForm($object, string $fieldName): FormInterface
     {
+        $metadata = $this->metadataFactory->getMetadataFor($object, $fieldName);
+
         return $this->formFactory->create(
-            ImageCollectionType::class,
+            $metadata->getFormType(),
             $object,
-            $this->getImageCollectionTypeOptions($object, $fieldName)
+            $this->getImageCollectionTypeOptions($metadata)
         );
     }
 
     /**
-     * @param $object
-     * @param string $fieldName
+     * @param ClassPropertyMetadataInterface $metadata
      * @return array
      */
-    public function getImageCollectionTypeOptions($object, string $fieldName): array
+    public function getImageCollectionTypeOptions(ClassPropertyMetadataInterface $metadata): array
     {
-        $metadata = $this->metadataFactory->getMetadataFor($object, $fieldName);
 
         return [
             'data_class' => $metadata->getClassName(),
