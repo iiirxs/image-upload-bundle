@@ -4,6 +4,7 @@ namespace IIIRxs\ImageUploadBundle\DependencyInjection;
 
 use IIIRxs\ImageUploadBundle\Controller\ImageController;
 use IIIRxs\ImageUploadBundle\Uploader\ChainUploader;
+use IIIRxs\ImageUploadBundle\Util\DirectoryHelper;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -47,21 +48,17 @@ class IIIRxsImageUploadExtension extends Extension implements CompilerPassInterf
         $metadataFactoryDefinition = $container->findDefinition(self::CLASS_PROPERTY_METADATA_FACTORY_ID);
         $paramConverterDefinition = $container->findDefinition(self::PARAM_CONVERTER_ID);
 
-        $metadataFactoryDefinition->setArgument(1, $config['mappings']);
-        $paramConverterDefinition->setArgument(1, $config['mappings']);
+        $metadataFactoryDefinition->setArgument(1, $config[Configuration::MAPPINGS]);
+        $paramConverterDefinition->setArgument(1, $config[Configuration::MAPPINGS]);
 
-        $container->setParameter(self::MAX_THUMBNAIL_PARAMETER, $config['max_thumbnail_dimension']);
-        $container->setParameter(self::CACHE_PROVIDER_PARAMETER, $config['cache_provider']);
+        $container->setParameter(self::MAX_THUMBNAIL_PARAMETER, $config[Configuration::MAX_THUMBNAIL_DIMENSION]);
+        $container->setParameter(self::CACHE_PROVIDER_PARAMETER, $config[Configuration::CACHE_PROVIDER]);
 
-        $defaultImageUploadDir = $config['default_image_upload_dir'] ?? null;
+        $defaultImageUploadDir = DirectoryHelper::getDirectoriesFromConfiguration($config, Configuration::DEFAULT_IMAGE_UPLOAD_DIR);
         if (!empty($defaultImageUploadDir)) {
-            $container->setParameter(self::IMAGE_DIR_PARAMETER, $config['default_image_upload_dir']);
+            $container->setParameter(self::IMAGE_DIR_PARAMETER, $defaultImageUploadDir);
         }
         $metadataFactoryDefinition->setArgument(2, $defaultImageUploadDir);
-
-        if (isset($config['default_image_upload_dir'])) {
-            $container->setParameter('iiirxs.image.upload.dir', $config['default_image_upload_dir']);
-        }
 
     }
 

@@ -9,6 +9,15 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    const MAX_THUMBNAIL_DIMENSION = 'max_thumbnail_dimension';
+    const CACHE_PROVIDER = 'cache_provider';
+    const DEFAULT_IMAGE_UPLOAD_DIR = 'default_image_upload_dir';
+    const MAPPINGS = 'mappings';
+
+    const DIRECTORIES_KEY = 'directories';
+    const OPTIMIZED_KEY = 'optimized';
+    const THUMBNAILS_KEY = 'thumbnails';
+
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder('iiirxs_image_upload');
@@ -16,20 +25,23 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->integerNode('max_thumbnail_dimension')
+                ->integerNode(self::MAX_THUMBNAIL_DIMENSION)
                     ->defaultValue(600)
                 ->end()
-                ->scalarNode('cache_provider')
+                ->scalarNode(self::CACHE_PROVIDER)
                     ->defaultValue('cache.app')
                 ->end()
-                ->arrayNode('default_image_upload_dir')
-                    ->beforeNormalization()->castToArray()->end()
+                ->arrayNode(self::DEFAULT_IMAGE_UPLOAD_DIR)
+                    ->beforeNormalization()
+                    ->ifString()
+                        ->then(function($value) { return [self::OPTIMIZED_KEY => $value]; })
+                    ->end()
                     ->children()
-                        ->scalarNode('optimized')->end()
-                        ->scalarNode('thumbnails')->end()
+                        ->scalarNode(self::OPTIMIZED_KEY)->end()
+                        ->scalarNode(self::THUMBNAILS_KEY)->end()
                     ->end()
                 ->end()
-                ->arrayNode('mappings')
+                ->arrayNode(self::MAPPINGS)
                     ->fixXmlConfig('mapping')
                     ->useAttributeAsKey('class')
                     ->arrayPrototype()
@@ -39,12 +51,16 @@ class Configuration implements ConfigurationInterface
                                 ->arrayPrototype()
                                     ->children()
                                         ->scalarNode('class')->end()
+                                        ->scalarNode('entry_type')->end()
                                         ->scalarNode('form_type')->end()
-                                        ->arrayNode('directories')
-                                            ->beforeNormalization()->castToArray()->end()
+                                        ->arrayNode(self::DIRECTORIES_KEY)
+                                            ->beforeNormalization()
+                                            ->ifString()
+                                                ->then(function($value) { return [self::OPTIMIZED_KEY => $value]; })
+                                            ->end()
                                             ->children()
-                                                ->scalarNode('optimized')->end()
-                                                ->scalarNode('thumbnails')->end()
+                                                ->scalarNode(self::OPTIMIZED_KEY)->end()
+                                                ->scalarNode(self::THUMBNAILS_KEY)->end()
                                             ->end()
                                         ->end()
                                     ->end()
