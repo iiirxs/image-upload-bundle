@@ -6,6 +6,7 @@ namespace IIIRxs\ImageUploadBundle\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Event\OnFlushEventArgs;
+use Doctrine\ODM\MongoDB\UnitOfWork;
 use IIIRxs\ImageUploadBundle\Document\ImageInterface;
 use IIIRxs\ImageUploadBundle\Event\ImagesDeleteEvent;
 use IIIRxs\ImageUploadBundle\Exception\InvalidImageCollectionException;
@@ -35,11 +36,7 @@ class OnFlushListener
             return $document instanceof ImageInterface;
         });
 
-        $mappings = array_reduce($imagesToBeDeleted, function ($curry, ImageInterface $image) use ($uow) {
-            list($mapping, $parent, $propertyPath) = $uow->getParentAssociation($image);
-            $curry[get_class($parent)][$mapping['fieldName']][] = $image;
-            return $curry;
-        }, []);
+        $mappings = $this->getDocumentMappings($imagesToBeDeleted, $uow);
 
         foreach ($mappings as $class => $mapping) {
             foreach ($mapping as $field => $images) {
@@ -54,6 +51,20 @@ class OnFlushListener
 //        foreach ($uow->getScheduledCollectionUpdates() as $col) {
 //            dump($col);
 //        }
+    }
+
+    private function getDocumentMappings(array $imagesToBeDeleted, UnitOfWork $uow): array
+    {
+        return array_reduce($imagesToBeDeleted, function ($curry, ImageInterface $image) use ($uow) {
+            list($mapping, $parent, $propertyPath) = $uow->getParentAssociation($image);
+
+            if (is_null($parent)) {
+                return [];
+            }
+
+            $curry[get_class($parent)][$mapping['fieldName']][] = $image;
+            return $curry;
+        }, []);
     }
 
 }

@@ -5,6 +5,7 @@ namespace IIIRxs\ImageUploadBundle\Mapping;
 
 use IIIRxs\ImageUploadBundle\DependencyInjection\Configuration;
 use IIIRxs\ImageUploadBundle\Exception\InvalidClassException;
+use IIIRxs\ImageUploadBundle\Form\Type\BaseParentType;
 use IIIRxs\ImageUploadBundle\Form\Type\ImageCollectionType;
 use IIIRxs\ImageUploadBundle\Form\Type\ImageType;
 use IIIRxs\ImageUploadBundle\Util\DirectoryHelper;
@@ -119,7 +120,11 @@ class ClassPropertyMetadata implements ClassPropertyMetadataInterface
     public function setFormType(string $formType): ClassPropertyMetadata
     {
         if (!class_exists($formType)) {
-            throw new InvalidClassException('Invalid mapped class in form_type configuration');
+            throw new InvalidClassException('Invalid mapped class in form_type configuration. Class does not exist.');
+        }
+
+        if (!is_subclass_of($formType, BaseParentType::class)) {
+            throw new InvalidClassException('Invalid mapped class in form_type configuration. Class should not extend BaseParentType class.');
         }
 
         $this->formType = $formType;

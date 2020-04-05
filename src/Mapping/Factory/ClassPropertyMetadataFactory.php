@@ -5,6 +5,7 @@ namespace IIIRxs\ImageUploadBundle\Mapping\Factory;
 
 
 use Doctrine\ODM\MongoDB\DocumentManager;
+use IIIRxs\ImageUploadBundle\DependencyInjection\Configuration;
 use IIIRxs\ImageUploadBundle\Document\AbstractImage;
 use IIIRxs\ImageUploadBundle\Exception\InvalidClassException;
 use IIIRxs\ImageUploadBundle\Exception\InvalidPropertyException;
@@ -53,7 +54,7 @@ class ClassPropertyMetadataFactory implements ClassPropertyMetadataFactoryInterf
             throw new InvalidPropertyException();
         }
 
-        $config = $this->mappings[$class]['fields'][$property] ?? [];
+        $config = $this->mappings[$class][Configuration::FIELDS_KEY][$property] ?? [];
         $metadata = new ClassPropertyMetadata($class, $property, $config);
 
         if (is_null($metadata->getImageClass())) {
@@ -78,13 +79,13 @@ class ClassPropertyMetadataFactory implements ClassPropertyMetadataFactoryInterf
         }
 
         $class = \is_string($class) ? $class : get_class($class);
-        $mappings = $this->mappings[$class]['fields'][$property] ?? [];
+        $mappings = $this->mappings[$class][Configuration::FIELDS_KEY][$property] ?? [];
 
         return
             class_exists($class)
             && property_exists($class, $property)
             && (
-                (isset($mappings['directories']) && !empty($mappings['directories']))
+                (isset($mappings[Configuration::DIRECTORIES_KEY]) && !empty($mappings[Configuration::DIRECTORIES_KEY]))
                 || !empty($this->defaultImageDir)
             )
         ;

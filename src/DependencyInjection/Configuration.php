@@ -15,6 +15,7 @@ class Configuration implements ConfigurationInterface
     const MAPPINGS = 'mappings';
 
     const DIRECTORIES_KEY = 'directories';
+    const FIELDS_KEY = 'fields';
     const OPTIMIZED_KEY = 'optimized';
     const THUMBNAILS_KEY = 'thumbnails';
 
@@ -46,7 +47,7 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('class')
                     ->arrayPrototype()
                         ->children()
-                            ->arrayNode('fields')
+                            ->arrayNode(self::FIELDS_KEY)
                                 ->useAttributeAsKey('name')
                                 ->arrayPrototype()
                                     ->children()

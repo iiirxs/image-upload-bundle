@@ -7,7 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ImageCollectionType extends AbstractType
+class ImageCollectionType extends BaseParentType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -27,11 +27,9 @@ class ImageCollectionType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'csrf_protection' => false,
-            'entry_type' => ImageType::class
-        ]);
+        $resolver->setDefault('csrf_protection', false);
+        $resolver->setDefault('entry_type', ImageType::class);
 
-        $resolver->setRequired(['field_name', 'data_class', 'image_data_class']);
+        parent::configureOptions($resolver);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace IIIRxs\ImageUploadBundle\Form;
 
+use IIIRxs\ImageUploadBundle\Form\Type\BaseParentType;
 use IIIRxs\ImageUploadBundle\Form\Type\ImageCollectionType;
 use IIIRxs\ImageUploadBundle\Mapping\ClassPropertyMetadata;
 use IIIRxs\ImageUploadBundle\Mapping\ClassPropertyMetadataInterface;
@@ -46,10 +47,15 @@ class ImageFormService
     {
         $metadata = $this->metadataFactory->getMetadataFor($object, $fieldName);
 
+        return $this->doCreateForm($metadata->getFormType(), $object, $this->getImageCollectionTypeOptions($metadata));
+    }
+
+    private function doCreateForm(string $parentTypeClass, $object, array $options)
+    {
         return $this->formFactory->create(
-            $metadata->getFormType(),
+            $parentTypeClass,
             $object,
-            $this->getImageCollectionTypeOptions($metadata)
+            $options
         );
     }
 
