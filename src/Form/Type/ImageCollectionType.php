@@ -27,9 +27,7 @@ class ImageCollectionType extends BaseParentType
 
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('csrf_protection', false);
-        $resolver->setDefault('entry_type', ImageType::class);
-
         parent::configureOptions($resolver);
+        $resolver->setDefault('csrf_protection', false);
     }
 }

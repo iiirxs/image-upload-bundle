@@ -98,7 +98,9 @@ class ImageListener implements EventSubscriberInterface
         $directories = $metadata->getDirectories();
         $directories = is_array($directories) ? $directories : [$directories];
         foreach ($directories as $directory) {
-            $filesystem->remove($directory . '/' . $image->getPath());
+            if (!empty($image->getPath())) {
+                $filesystem->remove($directory . '/' . $image->getPath());
+            }
         }
     }
 

@@ -5,6 +5,8 @@ namespace IIIRxs\ImageUploadBundle\Uploader;
 use IIIRxs\ImageUploadBundle\DependencyInjection\Configuration;
 use IIIRxs\ImageUploadBundle\Exception\InvalidUploadTargetDirException;
 use Spatie\ImageOptimizer\OptimizerChainFactory;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 abstract class AbstractUploader implements ImageUploaderInterface
@@ -75,9 +77,25 @@ abstract class AbstractUploader implements ImageUploaderInterface
     protected function validateTargetDir(): bool
     {
         $validKeys = [ Configuration::OPTIMIZED_KEY, Configuration::THUMBNAILS_KEY ];
-        return !empty($this->targetDir)
+        if (
+            !empty($this->targetDir)
             && !(is_array($this->targetDir)
-            && !empty(array_diff(array_keys($this->targetDir), $validKeys)));
+            && !empty(array_diff(array_keys($this->targetDir), $validKeys)))
+        ) {
+            return false;
+        };
+
+        $filesystem = new Filesystem();
+
+        $directories = is_string($this->targetDir) ? [$this->targetDir] : $this->targetDir;
+
+        foreach ($directories as $directory) {
+            if (!$filesystem->exists($directory)) {
+                $filesystem->mkdir($directory, 0750);
+            }
+        }
+
+        return true;
     }
 
     /**

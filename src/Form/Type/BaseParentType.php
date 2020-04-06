@@ -13,12 +13,10 @@ class BaseParentType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
+            'entry_type' => ImageType::class,
             'field_name' => null,
             'data_class' => null,
             'image_data_class' => null
         ]);
     }
-}
-{
-
 }
