@@ -77,11 +77,7 @@ abstract class AbstractUploader implements ImageUploaderInterface
     protected function validateTargetDir(): bool
     {
         $validKeys = [ Configuration::OPTIMIZED_KEY, Configuration::THUMBNAILS_KEY ];
-        if (
-            !empty($this->targetDir)
-            && !(is_array($this->targetDir)
-            && !empty(array_diff(array_keys($this->targetDir), $validKeys)))
-        ) {
+        if (is_array($this->targetDir) && !empty(array_diff(array_keys($this->targetDir), $validKeys))) {
             return false;
         };
 

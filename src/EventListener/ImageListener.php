@@ -3,7 +3,6 @@
 
 namespace IIIRxs\ImageUploadBundle\EventListener;
 
-use Doctrine\ODM\MongoDB\UnitOfWork;
 use IIIRxs\ImageUploadBundle\Document\ImageInterface;
 use IIIRxs\ImageUploadBundle\Event\ImagesDeleteEvent;
 use IIIRxs\ImageUploadBundle\Event\ImagesUploadEvent;
@@ -21,24 +20,18 @@ class ImageListener implements EventSubscriberInterface
     /** @var CacheClassPropertyMetadataFactory */
     private $metadataFactory;
 
-    /** @var UnitOfWork */
-    private $unitOfWork;
-
     /**
      * ImageListener constructor.
      * @param ChainUploader $uploader
      * @param CacheClassPropertyMetadataFactory $metadataFactory
-     * @param UnitOfWork $unitOfWork
      */
     public function __construct(
         ChainUploader $uploader,
-        CacheClassPropertyMetadataFactory $metadataFactory,
-        UnitOfWork $unitOfWork
+        CacheClassPropertyMetadataFactory $metadataFactory
     )
     {
         $this->uploader = $uploader;
         $this->metadataFactory = $metadataFactory;
-        $this->unitOfWork = $unitOfWork;
     }
 
     /**
