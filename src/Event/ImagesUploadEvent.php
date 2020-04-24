@@ -22,7 +22,7 @@ class ImagesUploadEvent extends AbstractImageEvent
         }
 
         $callable = function (ImageInterface $image) {
-            return $image->getFile() instanceof UploadedFile;
+            return $image->getFile() instanceof UploadedFile && $image->getFile()->isValid();
         };
 
         return $this->document->filter($callable);

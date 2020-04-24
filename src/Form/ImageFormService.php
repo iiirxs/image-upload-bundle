@@ -2,9 +2,6 @@
 
 namespace IIIRxs\ImageUploadBundle\Form;
 
-use IIIRxs\ImageUploadBundle\Form\Type\BaseParentType;
-use IIIRxs\ImageUploadBundle\Form\Type\ImageCollectionType;
-use IIIRxs\ImageUploadBundle\Mapping\ClassPropertyMetadata;
 use IIIRxs\ImageUploadBundle\Mapping\ClassPropertyMetadataInterface;
 use IIIRxs\ImageUploadBundle\Mapping\Factory\CacheClassPropertyMetadataFactory;
 use Symfony\Component\Form\FormFactory;

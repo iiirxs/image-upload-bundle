@@ -6,8 +6,6 @@ namespace IIIRxs\ImageUploadBundle\Mapping;
 use IIIRxs\ImageUploadBundle\DependencyInjection\Configuration;
 use IIIRxs\ImageUploadBundle\Exception\InvalidClassException;
 use IIIRxs\ImageUploadBundle\Form\Type\BaseParentType;
-use IIIRxs\ImageUploadBundle\Form\Type\ImageCollectionType;
-use IIIRxs\ImageUploadBundle\Form\Type\ImageType;
 use IIIRxs\ImageUploadBundle\Util\DirectoryHelper;
 
 class ClassPropertyMetadata implements ClassPropertyMetadataInterface
@@ -44,8 +42,8 @@ class ClassPropertyMetadata implements ClassPropertyMetadataInterface
         $this->propertyName = $propertyName;
 
         $this->setImageClass($config['class'] ?? null);
-        $this->setEntryType($config['entry_type'] ?? ImageType::class);
-        $this->setFormType($config['form_type'] ?? ImageCollectionType::class);
+        $this->setEntryType($config[Configuration::ENTRY_TYPE_KEY]);
+        $this->setFormType($config[Configuration::FORM_TYPE_KEY]);
         $this->directories = DirectoryHelper::getDirectoriesFromConfiguration($config, Configuration::DIRECTORIES_KEY);
     }
 

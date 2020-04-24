@@ -43,27 +43,19 @@ class OnFlushListener
                $this->eventDispatcher->dispatch(new ImagesDeleteEvent(new ArrayCollection($images), $class, $field));
             }
         }
-
-//        foreach ($uow->getScheduledCollectionDeletions() as $col) {
-//            dump($col);
-//        }
-//
-//        foreach ($uow->getScheduledCollectionUpdates() as $col) {
-//            dump($col);
-//        }
     }
 
     private function getDocumentMappings(array $imagesToBeDeleted, UnitOfWork $uow): array
     {
-        return array_reduce($imagesToBeDeleted, function ($curry, ImageInterface $image) use ($uow) {
+        return array_reduce($imagesToBeDeleted, function ($carry, ImageInterface $image) use ($uow) {
             list($mapping, $parent, $propertyPath) = $uow->getParentAssociation($image);
 
             if (is_null($parent)) {
                 return [];
             }
 
-            $curry[get_class($parent)][$mapping['fieldName']][] = $image;
-            return $curry;
+            $carry[get_class($parent)][$mapping['fieldName']][] = $image;
+            return $carry;
         }, []);
     }
 

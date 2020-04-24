@@ -4,6 +4,8 @@
 namespace IIIRxs\ImageUploadBundle\DependencyInjection;
 
 
+use IIIRxs\ImageUploadBundle\Form\Type\ImageCollectionType;
+use IIIRxs\ImageUploadBundle\Form\Type\ImageType;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -18,6 +20,8 @@ class Configuration implements ConfigurationInterface
     const FIELDS_KEY = 'fields';
     const OPTIMIZED_KEY = 'optimized';
     const THUMBNAILS_KEY = 'thumbnails';
+    const ENTRY_TYPE_KEY = 'entry_type';
+    const FORM_TYPE_KEY = 'form_type';
 
     public function getConfigTreeBuilder()
     {
@@ -52,8 +56,12 @@ class Configuration implements ConfigurationInterface
                                 ->arrayPrototype()
                                     ->children()
                                         ->scalarNode('class')->end()
-                                        ->scalarNode('entry_type')->end()
-                                        ->scalarNode('form_type')->end()
+                                        ->scalarNode(self::ENTRY_TYPE_KEY)
+                                            ->defaultValue(ImageType::class)
+                                        ->end()
+                                        ->scalarNode(self::FORM_TYPE_KEY)
+                                            ->defaultValue(ImageCollectionType::class)
+                                        ->end()
                                         ->arrayNode(self::DIRECTORIES_KEY)
                                             ->beforeNormalization()
                                             ->ifString()
